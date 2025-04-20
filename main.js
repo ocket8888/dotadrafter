@@ -1,11 +1,13 @@
 /**
- * @typedef HeroDom extends HTMLDivElement
+ * @typedef HeroDom
  * @type {object}
+ * @extends HTMLDivElement
  */
 
 /**
- * @typedef TeamListDom extends HTMLDivElement
+ * @typedef TeamListDom
  * @type {object}
+ * @extends HTMLDivElement
  * @property {[HeroDom, HeroDom, HeroDom, HeroDom, HeroDom]} children
  */
 
@@ -24,8 +26,9 @@
 /** @typedef {"str" | "agi" | "int" | "all"} Attribute */
 
 /**
- * @typedef Hero extends BasicHero
+ * @typedef Hero
  * @type {object}
+ * @extends BasicHero
  * @property {Attribute} primary_attr
  * @property {string} img
  * @property {string} icon
@@ -113,7 +116,7 @@ async function getHeroStats() {
 /**
  *
  * @param {number} id
- * @returns {Array<MatchUp>}
+ * @returns {Promise<Array<MatchUp>>}
  */
 async function getMatchups(id) {
 	const response = await fetch(new URL(`https://api.opendota.com/api/heroes/${id}/matchups`));
@@ -151,7 +154,7 @@ function fuzzyScore(query, item) {
 	return null;
 }
 
-/** @type {HTMLUListElement & {children: Array<HTMLLIElement>}} */
+/** @type {HTMLUListElement & {children: Array<HTMLLIElement & {parentElement: HTMLUListElement}>}} */
 let heroesList;
 /** @type {HTMLSelectElement & {value: Attribute | ""}} */
 let attrFilter;
