@@ -137,6 +137,35 @@ const allHeroes = [];
 const heroMap = new Map();
 
 /**
+ * Constructs an icon element for a hero attribute.
+ * @param {Attribute} attr
+ * @returns {HTMLImageElement}
+ */
+function attrIcon(attr) {
+	const prefix = "https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/icons";
+	let url;
+	switch(attr) {
+		case "agi":
+			url = `${prefix}/hero_agility.png`;
+			break;
+		case "all":
+			url = `${prefix}/hero_universal.png`;
+			break;
+		case "int":
+			url = `${prefix}/hero_intelligence.png`;
+			break;
+		case "str":
+			url = `${prefix}/hero_strength.png`;
+			break;
+	}
+
+	const elem = document.createElement("img");
+	elem.src = url;
+	elem.alt = `"${attr}" stat icon`;
+	return elem;
+}
+
+/**
  *
  * @param {string} query
  * @param {string} item
@@ -188,28 +217,81 @@ function selectHero(hero) {
 		return;
 	}
 
-	const name = document.createElement("H2");
-	name.textContent = hero.localized_name;
+	const name = document.createElement("H1");
+	name.appendChild(document.createTextNode(hero.localized_name));
+	name.appendChild(attrIcon(hero.primary_attr));
 	selHeroDiv.appendChild(name);
 
-	const heroImg = document.createElement("img");
-	heroImg.src = `https://cdn.cloudflare.steamstatic.com${hero.img}`;
-	heroImg.alt = `image depicting DotA2 hero ${hero.localized_name}`;
+	const heroShortName = hero.name.substring("npc_dota_hero_".length);
+	const videoPrefix = "https://cdn.akamai.steamstatic.com/apps/dota2/videos/dota_react/heroes/renders"
+	console.log("selected", heroShortName);
+	const heroImg = document.createElement("video");
+	heroImg.poster = `${videoPrefix}/${heroShortName}.png`;
+	heroImg.autoplay = true;
+	heroImg.loop = true;
+	heroImg.playsInline = true;
+	heroImg.preload = "auto";
+
+	const mp4Src = document.createElement("source");
+	mp4Src.type = "video/mp4; codecs=&quot;hvc1&quot"
+	mp4Src.src = `${videoPrefix}/${heroShortName}.mov`;
+	heroImg.appendChild(mp4Src);
+
+	const webmSrc = document.createElement("source");
+	webmSrc.type = "video/webm";
+	webmSrc.src = `${videoPrefix}/${heroShortName}.webm`;
+	heroImg.appendChild(webmSrc);
+
+	const imgSrc = document.createElement("img");
+	imgSrc.src = heroImg.poster;
+	imgSrc.alt = `fallback image for DotA2 hero "${hero.localized_name}"`;
+	heroImg.appendChild(imgSrc);
+
 	selHeroDiv.appendChild(heroImg);
 
-	const primaryAttr = document.createElement("span");
-	primaryAttr.textContent = hero.primary_attr;
-	selHeroDiv.appendChild(primaryAttr);
-
 	const agi = document.createElement("span");
-	agi.textContent = `${hero.base_agi} +${hero.agi_gain}`;
+	agi.appendChild(attrIcon("agi"));
+	agi.appendChild(document.createTextNode(`${hero.base_agi} +${hero.agi_gain}`));
 	selHeroDiv.appendChild(agi);
+
 	const int = document.createElement("span");
-	int.textContent = `${hero.base_int} +${hero.int_gain}`;
+	int.appendChild(attrIcon("int"));
+	int.appendChild(document.createTextNode(`${hero.base_int} +${hero.int_gain}`));
 	selHeroDiv.appendChild(int);
+
 	const str = document.createElement("span");
-	str.textContent = `${hero.base_str} +${hero.str_gain}`;
+	str.appendChild(attrIcon("str"));
+	str.appendChild(document.createTextNode(`${hero.base_str} +${hero.str_gain}`));
 	selHeroDiv.appendChild(str);
+
+	const footer = document.createElement("footer");
+	footer.classList.add("action-bar");
+
+	const addToTeamButton = document.createElement("button");
+	addToTeamButton.type = "button";
+	addToTeamButton.textContent = "Add to Team";
+	addToTeamButton.addEventListener("click", () => {
+		console.log("add", hero.localized_name, "to user's team");
+	});
+	footer.appendChild(addToTeamButton);
+
+	const banButton = document.createElement("button");
+	banButton.type = "button";
+	banButton.textContent = "Ban";
+	banButton.addEventListener("click", () => {
+		console.log("ban", hero.localized_name);
+	});
+	footer.appendChild(banButton);
+
+	const addToEnemyButton = document.createElement("button");
+	addToEnemyButton.type = "button";
+	addToEnemyButton.textContent = "Add to Enemy Team";
+	addToEnemyButton.addEventListener("click", () => {
+		console.log("add", hero.localized_name, "to enemy team");
+	});
+	footer.appendChild(addToEnemyButton);
+
+	selHeroDiv.appendChild(footer);
 }
 
 /**
@@ -229,11 +311,12 @@ function createHeroListing(hero) {
 	const elem = document.createElement("li");
 	elem.id = String(hero.id);
 	const figure = document.createElement("figure");
+	figure.classList.add("hero-list-figure");
 	const figCaption = document.createElement("figcaption");
 	figCaption.textContent = hero.localized_name;
 	const figImage = document.createElement("img");
-	figImage.src = `https://cdn.cloudflare.steamstatic.com${hero.icon}`;
-	figImage.alt = `an icon representative of DotA2 hero "${hero.localized_name}"`
+	figImage.src = `https://cdn.cloudflare.steamstatic.com${hero.img}`;
+	figImage.alt = `an icon representative of DotA2 hero "${hero.localized_name}"`;
 	figure.appendChild(figImage);
 	figure.appendChild(figCaption);
 	elem.appendChild(figure);

@@ -4,6 +4,7 @@ body {
 	height: 100vh;
 	width: 100vw;
 	margin: 0;
+	overflow: hidden;
 }
 
 #draft-panel {
@@ -16,31 +17,37 @@ body {
 #selected-hero {
 	height: 100%;
 	width: 100%;
+	display: grid;
+	align-content: start;
+	justify-content: center;
 }
 
-figure > img {
-	margin: auto;
+video {
+	height: 35vh;
 }
 
-figure {
+h1 {
 	text-align: center;
-	margin: 5px;
+}
+
+footer.action-bar {
+	align-self: end;
 }
 
 li.str {
-	background: red;
+	background: #EC3D06;
 }
 
 li.agi {
-	background: green;
+	background: #26E030;
 }
 
 li.int {
-	background: paleturquoise;
+	background: #01D9EC;
 }
 
 li.all {
-	background: purple;
+	background: linear-gradient(to bottom, #26e030, #87c800, #b3ad00, #ce9100, #dd7300, #d07c00, #c28400, #b58a00, #8ca835, #5abe74, #00ceb5, #01d9ec);
 }
 
 .herolist {
@@ -76,7 +83,17 @@ li.all {
 	margin: 5px;
 	border: 1px solid black;
 	border-radius: 3px;
-	padding: 2px;
+	width: 140px;
+	height: 140px;
+}
+
+.hero-list-figure {
+	max-width: 100%;
+	margin: 0 0 5px;
+}
+
+.hero-list-figure img {
+	width: 100%;
 }
 
 @media (max-width: 800px) {
