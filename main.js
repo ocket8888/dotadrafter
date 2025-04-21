@@ -1,11 +1,11 @@
 /**
- * @typedef HeroDom
+ * @typedef HeroDom extends HTMLDivElement
  * @type {object}
  * @extends HTMLDivElement
  */
 
 /**
- * @typedef TeamListDom
+ * @typedef TeamListDom extends HTMLDivElement
  * @type {object}
  * @extends HTMLDivElement
  * @property {[HeroDom, HeroDom, HeroDom, HeroDom, HeroDom]} children
@@ -26,9 +26,7 @@
 /** @typedef {"str" | "agi" | "int" | "all"} Attribute */
 
 /**
- * @typedef Hero
- * @type {object}
- * @extends BasicHero
+ * @typedef HeroProperties
  * @property {Attribute} primary_attr
  * @property {string} img
  * @property {string} icon
@@ -88,12 +86,22 @@
  * @property {[number, number, number, number, number, number, number]} turbo_wins_trend
  */
 
+/** @typedef {BasicHero & HeroProperties} Hero */
+
 /**
  * @typedef MatchUp
  * @type {object}
  * @property {number} hero_id
  * @property {number} games_played
  * @property {number} wins
+ */
+
+/**
+ * @typedef HeroListing
+ * @type {object}
+ * @property {Hero} hero
+ * @property {HeroDom} domElement
+ * @property {number} fuzzyScore
  */
 
 /**
@@ -156,8 +164,53 @@ function fuzzyScore(query, item) {
 
 /** @type {HTMLUListElement & {children: Array<HTMLLIElement & {parentElement: HTMLUListElement}>}} */
 let heroesList;
+/** @type {Array<HeroListing>} */
+let heroes = [];
 /** @type {HTMLSelectElement & {value: Attribute | ""}} */
 let attrFilter;
+
+/** @type {null | Hero} */
+let selectedHero = null;
+
+/**
+ * @param {null | Hero} hero
+ */
+function selectHero(hero) {
+	selectedHero = hero;
+
+	const selHeroDiv = document.getElementById("selected-hero");
+	if (!selHeroDiv || !(selHeroDiv instanceof HTMLDivElement)) {
+		throw new Error("no selected hero div in document");
+	}
+
+	selHeroDiv.replaceChildren();
+	if (hero === null) {
+		return;
+	}
+
+	const name = document.createElement("H2");
+	name.textContent = hero.localized_name;
+	selHeroDiv.appendChild(name);
+
+	const heroImg = document.createElement("img");
+	heroImg.src = `https://cdn.cloudflare.steamstatic.com${hero.img}`;
+	heroImg.alt = `image depicting DotA2 hero ${hero.localized_name}`;
+	selHeroDiv.appendChild(heroImg);
+
+	const primaryAttr = document.createElement("span");
+	primaryAttr.textContent = hero.primary_attr;
+	selHeroDiv.appendChild(primaryAttr);
+
+	const agi = document.createElement("span");
+	agi.textContent = `${hero.base_agi} +${hero.agi_gain}`;
+	selHeroDiv.appendChild(agi);
+	const int = document.createElement("span");
+	int.textContent = `${hero.base_int} +${hero.int_gain}`;
+	selHeroDiv.appendChild(int);
+	const str = document.createElement("span");
+	str.textContent = `${hero.base_str} +${hero.str_gain}`;
+	selHeroDiv.appendChild(str);
+}
 
 /**
  * @param {Attribute} attr
@@ -174,8 +227,20 @@ function filterAttribute(attr) {
  */
 function createHeroListing(hero) {
 	const elem = document.createElement("li");
-	elem.id = hero.id;
-	elem.appendChild(document.createTextNode(hero.localized_name));
+	elem.id = String(hero.id);
+	const figure = document.createElement("figure");
+	const figCaption = document.createElement("figcaption");
+	figCaption.textContent = hero.localized_name;
+	const figImage = document.createElement("img");
+	figImage.src = `https://cdn.cloudflare.steamstatic.com${hero.icon}`;
+	figImage.alt = `an icon representative of DotA2 hero "${hero.localized_name}"`
+	figure.appendChild(figImage);
+	figure.appendChild(figCaption);
+	elem.appendChild(figure);
+	elem.addEventListener("click", () => {
+		selectHero(hero);
+	});
+	elem.classList.add(hero.primary_attr);
 	return elem;
 }
 

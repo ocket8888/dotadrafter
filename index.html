@@ -8,33 +8,37 @@
 	<link rel="stylesheet" type="text/css" href="./draft.css"/>
 </head>
 <body>
-<div id="heroes">
-	<input type="search" id="search"/>
-	<label for="attr-filter" hidden>Filter by Attribute</label>
-	<select id="attr-filter" hidden>
-		<option value="" selected>-</option>
-		<option value="agi">Agility</option>
-		<option value="int">Intelligence</option>
-		<option value="str">Strength</option>
-		<option value="all">Universal</option>
-	</select>
-	<ul id="herolist"></ul>
+<div id="draft-panel">
+	<div id="heroes">
+		<input type="search" id="search"/>
+		<label for="attr-filter" hidden>Filter by Attribute</label>
+		<select id="attr-filter" hidden>
+			<option value="" selected>-</option>
+			<option value="agi">Agility</option>
+			<option value="int">Intelligence</option>
+			<option value="str">Strength</option>
+			<option value="all">Universal</option>
+		</select>
+		<ul id="herolist"></ul>
+	</div>
+	<div id="teams">
+		<div class="herolist" id="my-team">
+			<div class="hero"></div>
+			<div class="hero"></div>
+			<div class="hero"></div>
+			<div class="hero"></div>
+			<div class="hero"></div>
+		</div>
+		<div class="herolist" id="enemy-team">
+			<div class="hero"></div>
+			<div class="hero"></div>
+			<div class="hero"></div>
+			<div class="hero"></div>
+			<div class="hero"></div>
+		</div>
+	</div>
 </div>
-<div id="teams">
-	<div class="herolist" id="my-team">
-		<div class="hero"></div>
-		<div class="hero"></div>
-		<div class="hero"></div>
-		<div class="hero"></div>
-		<div class="hero"></div>
-	</div>
-	<div class="herolist" id="enemy-team">
-		<div class="hero"></div>
-		<div class="hero"></div>
-		<div class="hero"></div>
-		<div class="hero"></div>
-		<div class="hero"></div>
-	</div>
+<div id="selected-hero">
 </div>
 </body>
 </html>
