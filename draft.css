@@ -5,6 +5,7 @@ body {
 	width: 100vw;
 	margin: 0;
 	overflow: hidden;
+	font-family: Radiance, "Noto Sans", sans-serif;
 }
 
 #draft-panel {
@@ -28,10 +29,22 @@ video {
 
 h1 {
 	text-align: center;
+	font-family: Reaver, serif;
 }
 
 footer.action-bar {
 	align-self: end;
+	display: flex;
+	align-content: center;
+	justify-content: space-between;
+}
+
+footer.action-bar > button {
+	text-transform: uppercase;
+	font-family: Radiance, "Noto Sans", sans-serif;
+	font-weight: bold;
+	cursor: pointer;
+	padding: 8px;
 }
 
 li.str {
@@ -85,6 +98,7 @@ li.all {
 	border-radius: 3px;
 	width: 140px;
 	height: 140px;
+	cursor: pointer;
 }
 
 .hero-list-figure {
