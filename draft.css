@@ -28,7 +28,9 @@ video {
 }
 
 h1 {
-	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	font-family: Reaver, serif;
 }
 
@@ -139,6 +141,17 @@ li.all {
 
 .mana-bar {
 	background: linear-gradient(to right, #1056DB, #73F5FE);
+}
+
+.attr-container {
+	display: flex;
+	margin: 15px 0;
+	justify-content: space-around;
+}
+
+.attr-container > span {
+	display: flex;
+	align-items: center;
 }
 
 @media (max-width: 800px) {

@@ -131,6 +131,18 @@ async function getMatchups(id) {
 	return response.json();
 }
 
+/**
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K} tag
+ * @param {string} text
+ * @returns {HTMLElementTagNameMap[K]}
+ */
+function createElementWithText(tag, text) {
+	const elem = document.createElement(tag);
+	elem.textContent = text;
+	return elem;
+}
+
 /** @type {Array<Hero>} */
 const allHeroes = [];
 /** @type {Map<number, Hero>} */
@@ -218,7 +230,7 @@ function selectHero(hero) {
 	}
 
 	const name = document.createElement("H1");
-	name.appendChild(document.createTextNode(hero.localized_name));
+	name.appendChild(createElementWithText("span", hero.localized_name));
 	name.appendChild(attrIcon(hero.primary_attr));
 	selHeroDiv.appendChild(name);
 
@@ -251,61 +263,55 @@ function selectHero(hero) {
 
 	const hpBar = document.createElement("div");
 	hpBar.classList.add("hp-bar");
-	let max = document.createElement("span");
-	max.textContent = String(hero.base_health);
-	hpBar.appendChild(max);
-	let regen = document.createElement("span");
-	regen.textContent = `+${hero.base_health_regen}`;
-	hpBar.appendChild(regen);
+	hpBar.appendChild(createElementWithText("span", String(hero.base_health)));
+	hpBar.appendChild(createElementWithText("span", `+${hero.base_health_regen}`));
 	selHeroDiv.appendChild(hpBar);
 
 	const manaBar = document.createElement("div");
 	manaBar.classList.add("mana-bar");
-	max = document.createElement("span");
-	max.textContent = String(hero.base_mana);
-	manaBar.appendChild(max);
-	regen = document.createElement("span");
-	regen.textContent = `+${hero.base_mana_regen}`;
-	manaBar.appendChild(regen);
+	manaBar.appendChild(createElementWithText("span", String(hero.base_mana)));
+	manaBar.appendChild(createElementWithText("span", `+${hero.base_mana_regen}`));
 	selHeroDiv.appendChild(manaBar);
+
+	const attrContainer = document.createElement("div");
+	attrContainer.classList.add("attr-container");
 
 	const agi = document.createElement("span");
 	agi.appendChild(attrIcon("agi"));
-	agi.appendChild(document.createTextNode(`${hero.base_agi} +${hero.agi_gain}`));
-	selHeroDiv.appendChild(agi);
+	agi.appendChild(createElementWithText("span", `${hero.base_agi} +${hero.agi_gain}`));
+	attrContainer.appendChild(agi);
 
 	const int = document.createElement("span");
 	int.appendChild(attrIcon("int"));
-	int.appendChild(document.createTextNode(`${hero.base_int} +${hero.int_gain}`));
-	selHeroDiv.appendChild(int);
+	int.appendChild(createElementWithText("span", `${hero.base_int} +${hero.int_gain}`));
+	attrContainer.appendChild(int);
 
 	const str = document.createElement("span");
 	str.appendChild(attrIcon("str"));
-	str.appendChild(document.createTextNode(`${hero.base_str} +${hero.str_gain}`));
-	selHeroDiv.appendChild(str);
+	str.appendChild(createElementWithText("span", `${hero.base_str} +${hero.str_gain}`));
+	attrContainer.appendChild(str);
+
+	selHeroDiv.appendChild(attrContainer);
 
 	const footer = document.createElement("footer");
 	footer.classList.add("action-bar");
 
-	const addToTeamButton = document.createElement("button");
+	const addToTeamButton = createElementWithText("button", "Add to Team");
 	addToTeamButton.type = "button";
-	addToTeamButton.textContent = "Add to Team";
 	addToTeamButton.addEventListener("click", () => {
 		console.log("add", hero.localized_name, "to user's team");
 	});
 	footer.appendChild(addToTeamButton);
 
-	const banButton = document.createElement("button");
+	const banButton = createElementWithText("button", "Ban");
 	banButton.type = "button";
-	banButton.textContent = "Ban";
 	banButton.addEventListener("click", () => {
 		console.log("ban", hero.localized_name);
 	});
 	footer.appendChild(banButton);
 
-	const addToEnemyButton = document.createElement("button");
+	const addToEnemyButton = createElementWithText("button", "Add to Enemy Team");
 	addToEnemyButton.type = "button";
-	addToEnemyButton.textContent = "Add to Enemy Team";
 	addToEnemyButton.addEventListener("click", () => {
 		console.log("add", hero.localized_name, "to enemy team");
 	});
@@ -332,8 +338,7 @@ function createHeroListing(hero) {
 	elem.id = String(hero.id);
 	const figure = document.createElement("figure");
 	figure.classList.add("hero-list-figure");
-	const figCaption = document.createElement("figcaption");
-	figCaption.textContent = hero.localized_name;
+	const figCaption = createElementWithText("figcaption", hero.localized_name);
 	const figImage = document.createElement("img");
 	figImage.src = `https://cdn.cloudflare.steamstatic.com${hero.img}`;
 	figImage.alt = `an icon representative of DotA2 hero "${hero.localized_name}"`;
