@@ -50,15 +50,15 @@ footer.action-bar > button {
 }
 
 li.str {
-	background: #EC3D06;
+	background: linear-gradient(to bottom, white, #EC3D06);
 }
 
 li.agi {
-	background: #26E030;
+	background: linear-gradient(to bottom, white, #26E030);
 }
 
 li.int {
-	background: #01D9EC;
+	background: linear-gradient(to bottom, white, #01D9EC);
 }
 
 li.all {
