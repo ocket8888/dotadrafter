@@ -95,7 +95,8 @@
  * @type {object}
  * @property {Hero} hero
  * @property {HTMLLIElement} domElement
- * @property {number} fuzzyScore
+ * @property {number | null} fuzzyScore
+ * @property {boolean} onTeam
  */
 
 /**
@@ -139,7 +140,7 @@ function createElementWithText(tag, text) {
 
 /** @type {Array<Hero>} */
 const allHeroes = [];
-/** @type {Map<number, Hero>} */
+/** @type {Map<number, HeroListing>} */
 const heroMap = new Map();
 
 /**
@@ -249,7 +250,7 @@ function addToTeam(hero, team) {
 
 /**
  * @param {number} id
- * @returns {Hero}
+ * @returns {HeroListing}
  */
 function getHero(id) {
 	const hero = heroMap.get(id);
@@ -346,6 +347,9 @@ function selectHero(hero) {
 	addToTeamButton.type = "button";
 	addToTeamButton.addEventListener("click", () => {
 		addToTeam(hero, "ally");
+		getHero(hero.id).onTeam = true;
+		selectHero(null);
+		updateListings();
 	});
 	footer.appendChild(addToTeamButton);
 
@@ -353,6 +357,9 @@ function selectHero(hero) {
 	banButton.type = "button";
 	banButton.addEventListener("click", () => {
 		addToTeam(hero, "ban");
+		getHero(hero.id).onTeam = true;
+		selectHero(null);
+		updateListings();
 	});
 	footer.appendChild(banButton);
 
@@ -360,19 +367,13 @@ function selectHero(hero) {
 	addToEnemyButton.type = "button";
 	addToEnemyButton.addEventListener("click", () => {
 		addToTeam(hero, "enemy");
+		getHero(hero.id).onTeam = true;
+		selectHero(null);
+		updateListings();
 	});
 	footer.appendChild(addToEnemyButton);
 
 	selHeroDiv.appendChild(footer);
-}
-
-/**
- * @param {Attribute} attr
- */
-function filterAttribute(attr) {
-	for (const child of heroesList.children) {
-		child.hidden = getHero(Number(child.id)).primary_attr !== attr;
-	}
 }
 
 /**
@@ -398,40 +399,58 @@ function createHeroListing(hero) {
 }
 
 /**
- * @this {HTMLInputElement}
- * @param {KeyboardEvent} evt
+ * @param {HeroListing} heroListing
+ * @returns {boolean}
  */
-function search(evt) {
-	evt.stopPropagation();
-	if (!this.value) {
-		[...heroesList.children].sort((a, b) => {
-			a.hidden = false;
-			b.hidden = false;
-			const nameA = getHero(Number(a.id)).localized_name;
-			const nameB = getHero(Number(b.id)).localized_name;
-			return nameA > nameB ? 1 : -1;
-		}).forEach(n => n.parentElement.appendChild(n));
-		return;
+function shouldFilter(heroListing) {
+	if (heroListing.onTeam || heroListing.fuzzyScore === null) {
+		return true;
 	}
+	if (attrFilter.value && heroListing.hero.primary_attr !== attrFilter.value) {
+		return true;
+	}
+	return false;
+}
 
-	const query = this.value.toLowerCase();
-	[...heroesList.children].sort((a, b) => {
-		const scoreA = fuzzyScore(query, getHero(Number(a.id)).localized_name.toLowerCase());
-		const scoreB = fuzzyScore(query, getHero(Number(b.id)).localized_name.toLowerCase());
-		if (scoreA === null) {
-			a.hidden = true;
-			if (scoreB === null) {
-				b.hidden = true;
+/**
+ * Sorts and filters the hero listing based on the current filters. Fuzzy scores must have already
+ * been applied.
+ */
+function updateListings() {
+	heroes.sort((a, b) => {
+		if (shouldFilter(a)) {
+			a.domElement.hidden = true;
+			if (shouldFilter(b)) {
+				b.domElement.hidden = true;
 				return 0;
 			}
 			return 1;
 		}
-		if (scoreB === null) {
-			b.hidden = true;
-			return -1;
+		if (a.fuzzyScore === b.fuzzyScore) {
+			return a.hero.localized_name > b.hero.localized_name ? 1 : -1;
 		}
-		return scoreA - scoreB;
-	}).forEach(n => n.parentElement.appendChild(n));
+		return (a.fuzzyScore ?? 0) - (b.fuzzyScore ?? 0);
+	});
+	for (const hero of heroes) {
+		heroesList.appendChild(hero.domElement);
+	}
+}
+
+/**
+ * @this {HTMLInputElement}
+ */
+function search() {
+	if (!this.value) {
+		for (const hero of heroes) {
+			hero.fuzzyScore = 0;
+		}
+	} else {
+		for (const hero of heroes) {
+			hero.fuzzyScore = fuzzyScore(this.value.toLowerCase(), hero.hero.localized_name.toLowerCase());
+		}
+	}
+
+	updateListings();
 }
 
 globalThis.addEventListener("load", async () => {
@@ -442,7 +461,6 @@ globalThis.addEventListener("load", async () => {
 	const aFilter = document.getElementById("attr-filter");
 	const bans = document.getElementById("bans");
 
-	console.log("wat")
 	if (!me || !enemy || !searchBox || !hList || !aFilter || !bans) {
 		throw new Error("document setup not ready before script ran");
 	}
@@ -454,7 +472,6 @@ globalThis.addEventListener("load", async () => {
 		console.debug(aFilter);
 		throw new Error("aFilter should be an HTMLSelectElement");
 	}
-	console.log("the fuck");
 	myTeam = me;
 	enemyTeam = enemy;
 	heroesList = hList;
@@ -462,18 +479,23 @@ globalThis.addEventListener("load", async () => {
 	bannedHeroes = bans;
 
 	attrFilter.addEventListener("change", () => {
-		if (attrFilter.value === "") {
-			// need to not un-hide search-filtered heroes
-		}
+		updateListings();
 	});
 	searchBox.addEventListener("input", search);
 
-	const heroes = await getHeroStats();
-	for (const h of heroes.sort((a,b) => a.localized_name > b.localized_name ? 1 : -1)) {
+	const hs = await getHeroStats();
+	for (const h of hs.sort((a,b) => a.localized_name > b.localized_name ? 1 : -1)) {
 		allHeroes.push(h);
-		heroMap.set(h.id, h);
-		heroesList.appendChild(createHeroListing(h));
+		const hero = {
+			hero: h,
+			domElement: createHeroListing(h),
+			fuzzyScore: 0,
+			onTeam: false
+		};
+		heroes.push(hero)
+		heroMap.set(h.id, hero);
+		heroesList.appendChild(hero.domElement);
 	}
 
-	console.log(heroes);
+	console.log(hs);
 });
