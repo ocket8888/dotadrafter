@@ -99,6 +99,7 @@ li.all {
 	width: 140px;
 	height: 140px;
 	cursor: pointer;
+	text-align: center;
 }
 
 .hero-list-figure {
@@ -108,6 +109,36 @@ li.all {
 
 .hero-list-figure img {
 	width: 100%;
+}
+
+.hp-bar, .mana-bar {
+	text-shadow: 1px 1px 2px black;
+	color: white;
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	padding: 5px 0;
+}
+
+.hp-bar > span:first-child, .mana-bar > span:first-child {
+	position: absolute;
+	text-align: center;
+	width: 100%;
+}
+
+.hp-bar > span:last-child, .mana-bar > span:last-child {
+	flex-grow: 1;
+	text-align: end;
+	padding-right: 15%;
+	opacity: 0.75;
+}
+
+.hp-bar {
+	background: linear-gradient(to right, #286323, #7AF03C);
+}
+
+.mana-bar {
+	background: linear-gradient(to right, #1056DB, #73F5FE);
 }
 
 @media (max-width: 800px) {

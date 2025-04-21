@@ -249,6 +249,26 @@ function selectHero(hero) {
 
 	selHeroDiv.appendChild(heroImg);
 
+	const hpBar = document.createElement("div");
+	hpBar.classList.add("hp-bar");
+	let max = document.createElement("span");
+	max.textContent = String(hero.base_health);
+	hpBar.appendChild(max);
+	let regen = document.createElement("span");
+	regen.textContent = `+${hero.base_health_regen}`;
+	hpBar.appendChild(regen);
+	selHeroDiv.appendChild(hpBar);
+
+	const manaBar = document.createElement("div");
+	manaBar.classList.add("mana-bar");
+	max = document.createElement("span");
+	max.textContent = String(hero.base_mana);
+	manaBar.appendChild(max);
+	regen = document.createElement("span");
+	regen.textContent = `+${hero.base_mana_regen}`;
+	manaBar.appendChild(regen);
+	selHeroDiv.appendChild(manaBar);
+
 	const agi = document.createElement("span");
 	agi.appendChild(attrIcon("agi"));
 	agi.appendChild(document.createTextNode(`${hero.base_agi} +${hero.agi_gain}`));
