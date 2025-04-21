@@ -426,6 +426,12 @@ function updateListings() {
 			}
 			return 1;
 		}
+		a.domElement.hidden = false;
+		if (shouldFilter(b)) {
+			b.domElement.hidden = true;
+			return -1;
+		}
+		b.domElement.hidden = false;
 		if (a.fuzzyScore === b.fuzzyScore) {
 			return a.hero.localized_name > b.hero.localized_name ? 1 : -1;
 		}
@@ -496,6 +502,4 @@ globalThis.addEventListener("load", async () => {
 		heroMap.set(h.id, hero);
 		heroesList.appendChild(hero.domElement);
 	}
-
-	console.log(hs);
 });
