@@ -11,7 +11,7 @@
 <body>
 <div id="draft-panel">
 	<div id="heroes">
-		<input type="search" id="search"/>
+		<input type="search" id="search" aria-label="search for heroes"/>
 		<label for="attr-filter" hidden>Filter by Attribute</label>
 		<select id="attr-filter" hidden>
 			<option value="" selected>-</option>
@@ -23,8 +23,11 @@
 		<ul id="herolist"></ul>
 	</div>
 	<div id="teams">
+		<h2>Your Team</h2>
 		<div class="herolist" id="my-team"></div>
-		<div class="bans"></div>
+		<h2>Bans</h2>
+		<div class="herolist" id="bans"></div>
+		<h2>Enemy Team</h2>
 		<div class="herolist" id="enemy-team"></div>
 	</div>
 </div>

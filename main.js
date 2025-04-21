@@ -1,16 +1,3 @@
-/**
- * @typedef HeroDom extends HTMLDivElement
- * @type {object}
- * @extends HTMLDivElement
- */
-
-/**
- * @typedef TeamListDom extends HTMLDivElement
- * @type {object}
- * @extends HTMLDivElement
- * @property {[HeroDom, HeroDom, HeroDom, HeroDom, HeroDom]} children
- */
-
 /** @typedef {"Carry" | "Escape" | "Nuker" | "Support" | "Durable" | "Disabler"} Role */
 /**
  * @typedef BasicHero
@@ -60,22 +47,6 @@
  * @property {number} pro_ban
  * @property {number} pro_pick
  * @property {number} pro_win
- * @property {number} 1_pick
- * @property {number} 1_win
- * @property {number} 2_pick
- * @property {number} 2_win
- * @property {number} 3_pick
- * @property {number} 3_win
- * @property {number} 4_pick
- * @property {number} 4_win
- * @property {number} 5_pick
- * @property {number} 5_win
- * @property {number} 6_pick
- * @property {number} 6_win
- * @property {number} 7_pick
- * @property {number} 7_win
- * @property {number} 8_pick
- * @property {number} 8_win
  * @property {number} pub_pick
  * @property {[number, number, number, number, number, number, number]} pub_pick_trend
  * @property {number} pub_win
@@ -86,7 +57,30 @@
  * @property {[number, number, number, number, number, number, number]} turbo_wins_trend
  */
 
-/** @typedef {BasicHero & HeroProperties} Hero */
+/**
+ * @typedef {{
+ * "1_pick": number;
+ * "1_win": number;
+ * "2_pick": number;
+ * "2_win": number;
+ * "3_pick": number;
+ * "3_win": number;
+ * "4_pick": number;
+ * "4_win": number;
+ * "5_pick": number;
+ * "5_win": number;
+ * "6_pick": number;
+ * "6_win": number;
+ * "7_pick": number;
+ * "7_win": number;
+ * "8_pick": number;
+ * "8_win": number;
+ * }} UnusualHeroProperties This is necessary because JSDoc doesn't handle property names that
+ * aren't valid identifiers, but doing it this way doesn't allow descriptions which i may want to
+ * add later.
+ */
+
+/** @typedef {BasicHero & HeroProperties & UnusualHeroProperties} Hero */
 
 /**
  * @typedef MatchUp
@@ -100,7 +94,7 @@
  * @typedef HeroListing
  * @type {object}
  * @property {Hero} hero
- * @property {HeroDom} domElement
+ * @property {HTMLLIElement} domElement
  * @property {number} fuzzyScore
  */
 
@@ -203,15 +197,67 @@ function fuzzyScore(query, item) {
 	return null;
 }
 
-/** @type {HTMLUListElement & {children: Array<HTMLLIElement & {parentElement: HTMLUListElement}>}} */
+/** @type {HTMLUListElement} */
 let heroesList;
 /** @type {Array<HeroListing>} */
 let heroes = [];
-/** @type {HTMLSelectElement & {value: Attribute | ""}} */
+/** @type {HTMLSelectElement} */
 let attrFilter;
 
 /** @type {null | Hero} */
 let selectedHero = null;
+
+/** @type {HTMLElement} */
+let myTeam;
+/** @type {HTMLElement} */
+let enemyTeam;
+/** @type {HTMLElement} */
+let bannedHeroes;
+
+/**
+ * Creates an `img` tag for an image of a given Hero.
+ * @param {Hero} hero The hero in question
+ * @returns {HTMLImageElement}
+ */
+function heroImage(hero) {
+	const elem = document.createElement("img");
+	elem.src = `https://cdn.cloudflare.steamstatic.com${hero.img}`;
+	elem.alt = `an icon representative of DotA2 hero "${hero.localized_name}"`;
+	return elem;
+}
+
+/**
+ * @param {Hero} hero
+ * @param {"ally" | "enemy" | "ban"} team
+ */
+function addToTeam(hero, team) {
+	const elem = document.createElement("figure");
+	const figImage = heroImage(hero);
+	elem.appendChild(figImage);
+	if (team === "ban") {
+		bannedHeroes.appendChild(elem);
+		return;
+	}
+
+	elem.appendChild(createElementWithText("figcaption", hero.localized_name));
+	if (team === "enemy") {
+		enemyTeam.appendChild(elem);
+	} else {
+		myTeam.appendChild(elem);
+	}
+}
+
+/**
+ * @param {number} id
+ * @returns {Hero}
+ */
+function getHero(id) {
+	const hero = heroMap.get(id);
+	if (!hero) {
+		throw new Error(`no hero by ID ${id}`);
+	}
+	return hero;
+}
 
 /**
  * @param {null | Hero} hero
@@ -299,21 +345,21 @@ function selectHero(hero) {
 	const addToTeamButton = createElementWithText("button", "Add to Team");
 	addToTeamButton.type = "button";
 	addToTeamButton.addEventListener("click", () => {
-		console.log("add", hero.localized_name, "to user's team");
+		addToTeam(hero, "ally");
 	});
 	footer.appendChild(addToTeamButton);
 
 	const banButton = createElementWithText("button", "Ban");
 	banButton.type = "button";
 	banButton.addEventListener("click", () => {
-		console.log("ban", hero.localized_name);
+		addToTeam(hero, "ban");
 	});
 	footer.appendChild(banButton);
 
 	const addToEnemyButton = createElementWithText("button", "Add to Enemy Team");
 	addToEnemyButton.type = "button";
 	addToEnemyButton.addEventListener("click", () => {
-		console.log("add", hero.localized_name, "to enemy team");
+		addToTeam(hero, "enemy");
 	});
 	footer.appendChild(addToEnemyButton);
 
@@ -325,7 +371,7 @@ function selectHero(hero) {
  */
 function filterAttribute(attr) {
 	for (const child of heroesList.children) {
-		child.hidden = heroMap.get(Number(child.id)).primary_attr !== attr;
+		child.hidden = getHero(Number(child.id)).primary_attr !== attr;
 	}
 }
 
@@ -339,9 +385,8 @@ function createHeroListing(hero) {
 	const figure = document.createElement("figure");
 	figure.classList.add("hero-list-figure");
 	const figCaption = createElementWithText("figcaption", hero.localized_name);
-	const figImage = document.createElement("img");
-	figImage.src = `https://cdn.cloudflare.steamstatic.com${hero.img}`;
-	figImage.alt = `an icon representative of DotA2 hero "${hero.localized_name}"`;
+	const figImage = heroImage(hero);
+	figImage.width = 140;
 	figure.appendChild(figImage);
 	figure.appendChild(figCaption);
 	elem.appendChild(figure);
@@ -362,8 +407,8 @@ function search(evt) {
 		[...heroesList.children].sort((a, b) => {
 			a.hidden = false;
 			b.hidden = false;
-			const nameA = heroMap.get(Number(a.id)).localized_name;
-			const nameB = heroMap.get(Number(b.id)).localized_name;
+			const nameA = getHero(Number(a.id)).localized_name;
+			const nameB = getHero(Number(b.id)).localized_name;
 			return nameA > nameB ? 1 : -1;
 		}).forEach(n => n.parentElement.appendChild(n));
 		return;
@@ -371,8 +416,8 @@ function search(evt) {
 
 	const query = this.value.toLowerCase();
 	[...heroesList.children].sort((a, b) => {
-		const scoreA = fuzzyScore(query, heroMap.get(Number(a.id)).localized_name.toLowerCase());
-		const scoreB = fuzzyScore(query, heroMap.get(Number(b.id)).localized_name.toLowerCase());
+		const scoreA = fuzzyScore(query, getHero(Number(a.id)).localized_name.toLowerCase());
+		const scoreB = fuzzyScore(query, getHero(Number(b.id)).localized_name.toLowerCase());
 		if (scoreA === null) {
 			a.hidden = true;
 			if (scoreB === null) {
@@ -390,18 +435,31 @@ function search(evt) {
 }
 
 globalThis.addEventListener("load", async () => {
-	/** @type {TeamListDom | null} */
-	const myTeam = document.getElementById("my-team");
-	/** @type {TeamListDom | null} */
-	const enemyTeam = document.getElementById("enemy-team");
-	/** @type { HTMLInputElement & {type: "search"} | null} */
+	const me = document.getElementById("my-team");
+	const enemy = document.getElementById("enemy-team");
 	const searchBox = document.getElementById("search");
-	heroesList = document.getElementById("herolist");
-	attrFilter = document.getElementById("attr-filter");
+	const hList = document.getElementById("herolist");
+	const aFilter = document.getElementById("attr-filter");
+	const bans = document.getElementById("bans");
 
-	if (!myTeam || !enemyTeam || !searchBox || !heroesList || !attrFilter) {
+	console.log("wat")
+	if (!me || !enemy || !searchBox || !hList || !aFilter || !bans) {
 		throw new Error("document setup not ready before script ran");
 	}
+	if (!(hList instanceof HTMLUListElement)) {
+		console.debug(hList);
+		throw new Error("hList should be an HTMLUListElement")
+	}
+	if (!(aFilter instanceof HTMLSelectElement)) {
+		console.debug(aFilter);
+		throw new Error("aFilter should be an HTMLSelectElement");
+	}
+	console.log("the fuck");
+	myTeam = me;
+	enemyTeam = enemy;
+	heroesList = hList;
+	attrFilter = aFilter;
+	bannedHeroes = bans;
 
 	attrFilter.addEventListener("change", () => {
 		if (attrFilter.value === "") {

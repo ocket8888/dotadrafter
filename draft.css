@@ -65,10 +65,37 @@ li.all {
 	background: linear-gradient(to bottom, #26e030, #87c800, #b3ad00, #ce9100, #dd7300, #d07c00, #c28400, #b58a00, #8ca835, #5abe74, #00ceb5, #01d9ec);
 }
 
+#teams {
+	padding: 24px;
+}
+
 .herolist {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	column-gap: 16px;
+	max-width: 100%;
+	margin: 8px 0;
+	text-align: center;
+	min-height: 161px;
+}
+
+.herolist figure {
+	font-family: Reaver, sans-serif;
+	margin: 0;
+}
+
+.herolist img {
+	max-width: 100%;
 	width: 100%;
+}
+
+#bans {
+	max-width: 55%;
+	min-height: 77px;
+}
+
+#bans img {
+	filter: grayscale(100%);
 }
 
 .hero {
