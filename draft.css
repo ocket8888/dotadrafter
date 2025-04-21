@@ -33,7 +33,7 @@ body {
 	max-height: 50vh;
 }
 
-#herolist > li {
+#herolist > li:not([hidden]) {
 	list-style: none;
 	display: inline-block;
 	margin: 5px;
