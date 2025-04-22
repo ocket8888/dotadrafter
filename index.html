@@ -12,17 +12,45 @@
 <div id="draft-panel">
 	<div id="heroes">
 		<div class="search-controls">
-			<input type="search" id="search" aria-label="search for heroes"/>
-			<div>
-				<label for="attr-filter">Filter by Attribute</label>
-				<select id="attr-filter">
-					<option value="" selected>-</option>
-					<option value="agi">Agility</option>
-					<option value="int">Intelligence</option>
-					<option value="str">Strength</option>
-					<option value="all">Universal</option>
-				</select>
+			<div class="attr-filters">
+				<input
+					type="checkbox"
+					id="str-filter"
+					class="attr-filter-button"
+					style="background-image: url('https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/herogrid/filter-str-active.png');"
+					aria-label="show/hide strength heroes"
+					title="show/hide strength heroes"
+				/>
+				<input
+					type="checkbox"
+					id="agi-filter"
+					class="attr-filter-button"
+					style="background-image: url('https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/herogrid/filter-agi-active.png');"
+					aria-label="show/hide agility heroes"
+					title="show/hide agility heroes"
+				/>
+				<input
+					type="checkbox"
+					id="int-filter"
+					class="attr-filter-button"
+					style="background-image: url('https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/herogrid/filter-int-active.png');"
+					aria-label="show/hide intelligence heroes"
+					title="show/hide intelligence heroes"
+				/>
+				<input
+					type="checkbox"
+					id="uni-filter"
+					class="attr-filter-button"
+					style="background-image: url('https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/herogrid/filter-uni-active.png');"
+					aria-label="show/hide universal heroes"
+					title="show/hide universal heroes"
+				/>
 			</div>
+			<form id="searchbox-container">
+				<label for="search" title="search for heroes">🔍</label>
+				<input type="search" id="search" aria-label="search for heroes" value=""/>
+				<button type="reset" title="clear search bar">❌</button>
+			</form>
 		</div>
 		<ul id="herolist"></ul>
 	</div>

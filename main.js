@@ -202,8 +202,13 @@ function fuzzyScore(query, item) {
 let heroesList;
 /** @type {Array<HeroListing>} */
 let heroes = [];
-/** @type {HTMLSelectElement} */
-let attrFilter;
+
+const filterState = {
+	str: false,
+	agi: false,
+	int: false,
+	all: false,
+};
 
 /** @type {null | Hero} */
 let selectedHero = null;
@@ -325,7 +330,6 @@ function selectHero(hero) {
 
 	const heroShortName = hero.name.substring("npc_dota_hero_".length);
 	const videoPrefix = "https://cdn.akamai.steamstatic.com/apps/dota2/videos/dota_react/heroes/renders"
-	console.log("selected", heroShortName);
 	const heroImg = document.createElement("video");
 	heroImg.poster = `${videoPrefix}/${heroShortName}.png`;
 	heroImg.autoplay = true;
@@ -451,7 +455,7 @@ function shouldFilter(heroListing) {
 	if (heroListing.onTeam || heroListing.fuzzyScore === null) {
 		return true;
 	}
-	if (attrFilter.value && heroListing.hero.primary_attr !== attrFilter.value) {
+	if (Object.values(filterState).some(x => x) && !filterState[heroListing.hero.primary_attr]) {
 		return true;
 	}
 	return false;
@@ -509,27 +513,49 @@ globalThis.addEventListener("load", async () => {
 	const enemy = document.getElementById("enemy-team");
 	const searchBox = document.getElementById("search");
 	const hList = document.getElementById("herolist");
-	const aFilter = document.getElementById("attr-filter");
+	const strFilter = document.getElementById("str-filter");
+	const agiFilter = document.getElementById("agi-filter");
+	const intFilter = document.getElementById("int-filter");
+	const uniFilter = document.getElementById("uni-filter");
 	const bans = document.getElementById("bans");
 
-	if (!me || !enemy || !searchBox || !hList || !aFilter || !bans) {
-		throw new Error("document setup not ready before script ran");
+	if (!me || !enemy || !searchBox || !hList || !strFilter || !agiFilter || !intFilter || !uniFilter || !bans) {
+		console.error("document setup not ready before script ran");
+		return;
 	}
 	if (!(hList instanceof HTMLUListElement)) {
 		console.debug(hList);
-		throw new Error("hList should be an HTMLUListElement")
+		console.error("hList should be an HTMLUListElement");
+		return;
 	}
-	if (!(aFilter instanceof HTMLSelectElement)) {
-		console.debug(aFilter);
-		throw new Error("aFilter should be an HTMLSelectElement");
+	if (!(strFilter instanceof HTMLInputElement && agiFilter instanceof HTMLInputElement && intFilter instanceof HTMLInputElement && uniFilter instanceof HTMLInputElement)) {
+		console.debug(strFilter, agiFilter, intFilter, uniFilter);
+		console.error("filters should be checkbox inputs");
+		return;
 	}
 	myTeam = me;
 	enemyTeam = enemy;
 	heroesList = hList;
-	attrFilter = aFilter;
 	bannedTeam = bans;
 
-	attrFilter.addEventListener("change", () => {
+	strFilter.checked = false;
+	strFilter.addEventListener("change", () => {
+		filterState.str = !filterState.str;
+		updateListings();
+	});
+	agiFilter.checked = false;
+	agiFilter.addEventListener("change", () => {
+		filterState.agi = !filterState.agi;
+		updateListings();
+	});
+	intFilter.checked = false;
+	intFilter.addEventListener("change", () => {
+		filterState.int = !filterState.int;
+		updateListings();
+	});
+	uniFilter.checked = false;
+	uniFilter.addEventListener("change", () => {
+		filterState.all = !filterState.all;
 		updateListings();
 	});
 	searchBox.addEventListener("input", search);
