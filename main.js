@@ -213,7 +213,7 @@ let myTeam;
 /** @type {HTMLElement} */
 let enemyTeam;
 /** @type {HTMLElement} */
-let bannedHeroes;
+let bannedTeam;
 
 /**
  * Creates an `img` tag for an image of a given Hero.
@@ -233,14 +233,28 @@ function heroImage(hero) {
  */
 function addToTeam(hero, team) {
 	const elem = document.createElement("figure");
+	elem.id = `${hero.id}`;
 	const figImage = heroImage(hero);
 	elem.appendChild(figImage);
+
+	const remover = document.createElement("div");
+	remover.classList.add("remover");
+	const removeButton = createElementWithText("button", "❌");
+	removeButton.type = "button";
+	removeButton.title = `remove ${hero.localized_name} from ${team}${team !== "ban" ? " " +team+" team" : "s"}`;
+	removeButton.addEventListener("click", () => {
+		console.log(removeButton.title);
+	});
+	remover.appendChild(removeButton);
+
 	if (team === "ban") {
-		bannedHeroes.appendChild(elem);
+		elem.appendChild(remover);
+		bannedTeam.appendChild(elem);
 		return;
 	}
 
 	elem.appendChild(createElementWithText("figcaption", hero.localized_name));
+	elem.appendChild(remover);
 	if (team === "enemy") {
 		enemyTeam.appendChild(elem);
 	} else {
@@ -345,6 +359,7 @@ function selectHero(hero) {
 
 	const addToTeamButton = createElementWithText("button", "Add to Team");
 	addToTeamButton.type = "button";
+	addToTeamButton.disabled = myTeam.children.length >= 5;
 	addToTeamButton.addEventListener("click", () => {
 		addToTeam(hero, "ally");
 		getHero(hero.id).onTeam = true;
@@ -355,6 +370,7 @@ function selectHero(hero) {
 
 	const banButton = createElementWithText("button", "Ban");
 	banButton.type = "button";
+	banButton.disabled = bannedTeam.children.length >= 14;
 	banButton.addEventListener("click", () => {
 		addToTeam(hero, "ban");
 		getHero(hero.id).onTeam = true;
@@ -365,6 +381,7 @@ function selectHero(hero) {
 
 	const addToEnemyButton = createElementWithText("button", "Add to Enemy Team");
 	addToEnemyButton.type = "button";
+	addToEnemyButton.disabled = enemyTeam.children.length >= 5;
 	addToEnemyButton.addEventListener("click", () => {
 		addToTeam(hero, "enemy");
 		getHero(hero.id).onTeam = true;
@@ -482,7 +499,7 @@ globalThis.addEventListener("load", async () => {
 	enemyTeam = enemy;
 	heroesList = hList;
 	attrFilter = aFilter;
-	bannedHeroes = bans;
+	bannedTeam = bans;
 
 	attrFilter.addEventListener("change", () => {
 		updateListings();
