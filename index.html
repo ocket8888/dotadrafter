@@ -11,15 +11,19 @@
 <body>
 <div id="draft-panel">
 	<div id="heroes">
-		<input type="search" id="search" aria-label="search for heroes"/>
-		<label for="attr-filter" hidden>Filter by Attribute</label>
-		<select id="attr-filter" hidden>
-			<option value="" selected>-</option>
-			<option value="agi">Agility</option>
-			<option value="int">Intelligence</option>
-			<option value="str">Strength</option>
-			<option value="all">Universal</option>
-		</select>
+		<div class="search-controls">
+			<input type="search" id="search" aria-label="search for heroes"/>
+			<div>
+				<label for="attr-filter">Filter by Attribute</label>
+				<select id="attr-filter">
+					<option value="" selected>-</option>
+					<option value="agi">Agility</option>
+					<option value="int">Intelligence</option>
+					<option value="str">Strength</option>
+					<option value="all">Universal</option>
+				</select>
+			</div>
+		</div>
 		<ul id="herolist"></ul>
 	</div>
 	<div id="teams">
