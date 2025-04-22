@@ -228,6 +228,46 @@ function heroImage(hero) {
 }
 
 /**
+ * @param {number} id
+ * @returns {HeroListing}
+ */
+function getHero(id) {
+	const hero = heroMap.get(id);
+	if (!hero) {
+		throw new Error(`no hero by ID ${id}`);
+	}
+	return hero;
+}
+
+/**
+ * Removes a hero from the specified team.
+ * @param {Hero} hero
+ * @param {"ally" | "enemy" | "ban"} team
+ */
+function removeHeroFromTeam(hero, team) {
+	let teamDom;
+	switch(team) {
+		case "ally":
+			teamDom = myTeam;
+			break;
+		case "enemy":
+			teamDom = enemyTeam;
+			break;
+		case "ban":
+			teamDom = bannedTeam;
+			break;
+	}
+	for (const child of teamDom.children) {
+		if (child instanceof HTMLElement && Number(child.id) === hero.id) {
+			teamDom.removeChild(child);
+			break;
+		}
+	}
+	getHero(hero.id).onTeam = false;
+	updateListings();
+}
+
+/**
  * @param {Hero} hero
  * @param {"ally" | "enemy" | "ban"} team
  */
@@ -243,7 +283,7 @@ function addToTeam(hero, team) {
 	removeButton.type = "button";
 	removeButton.title = `remove ${hero.localized_name} from ${team}${team !== "ban" ? " " +team+" team" : "s"}`;
 	removeButton.addEventListener("click", () => {
-		console.log(removeButton.title);
+		removeHeroFromTeam(hero, team);
 	});
 	remover.appendChild(removeButton);
 
@@ -260,18 +300,6 @@ function addToTeam(hero, team) {
 	} else {
 		myTeam.appendChild(elem);
 	}
-}
-
-/**
- * @param {number} id
- * @returns {HeroListing}
- */
-function getHero(id) {
-	const hero = heroMap.get(id);
-	if (!hero) {
-		throw new Error(`no hero by ID ${id}`);
-	}
-	return hero;
 }
 
 /**
