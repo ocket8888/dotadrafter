@@ -199,6 +199,7 @@ li.all {
 
 .hero-list-figure img {
 	width: 100%;
+	aspect-ratio: 16/9 auto;
 }
 
 .hp-bar, .mana-bar {

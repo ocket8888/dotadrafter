@@ -2,34 +2,40 @@
 	font-family: Radiance;
 	src: url(https://cdn.akamai.steamstatic.com/apps/dota2/fonts/radiance.woff);
 	font-weight: normal;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: Radiance;
 	src: url(https://cdn.akamai.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff);
 	font-weight: bold;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: Radiance;
 	src: url(https://cdn.akamai.steamstatic.com/apps/dota2/fonts/radiance-bold.woff);
 	font-weight: bolder;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: Reaver;
 	src: url(https://cdn.akamai.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff);
 	font-weight: normal;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: Reaver;
 	src: url(https://cdn.akamai.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff);
 	font-weight: bold;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: Reaver;
 	src: url(https://cdn.akamai.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff);
 	font-weight: bolder;
+	font-display: swap;
 }
