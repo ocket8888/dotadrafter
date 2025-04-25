@@ -559,6 +559,7 @@ globalThis.addEventListener("load", async () => {
 		updateListings();
 	});
 	searchBox.addEventListener("input", search);
+	document.addEventListener("reset", search);
 
 	const hs = await getHeroStats();
 	for (const h of hs.sort((a,b) => a.localized_name > b.localized_name ? 1 : -1)) {
