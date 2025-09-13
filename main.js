@@ -100,15 +100,6 @@
  */
 
 /**
- *
- * @returns {Promise<Array<BasicHero>>}
- */
-async function getHeroes() {
-	const response = await fetch(new URL("https://api.opendota.com/api/heroes"));
-	return response.json();
-}
-
-/**
  * @returns {Promise<Array<Hero>>}
  */
 async function getHeroStats() {
@@ -117,9 +108,10 @@ async function getHeroStats() {
 }
 
 /**
+ * Gets matchup stats for a given hero versus other heroes.
  *
- * @param {number} id
- * @returns {Promise<Array<MatchUp>>}
+ * @param {number} id The ID of the hero to fetch.
+ * @returns {Promise<Array<MatchUp>>} A list of the matchups for the Hero identified by `id`.
  */
 async function getMatchups(id) {
 	const response = await fetch(new URL(`https://api.opendota.com/api/heroes/${id}/matchups`));
@@ -222,8 +214,9 @@ let bannedTeam;
 
 /**
  * Creates an `img` tag for an image of a given Hero.
- * @param {Hero} hero The hero in question
- * @returns {HTMLImageElement}
+ *
+ * @param {Hero} hero The hero in question.
+ * @returns {HTMLImageElement} An HTML image element that displays the hero.
  */
 function heroImage(hero) {
 	const elem = document.createElement("img");
@@ -233,8 +226,11 @@ function heroImage(hero) {
 }
 
 /**
- * @param {number} id
- * @returns {HeroListing}
+ * Gets a hero from the local cache of hero listings.
+ *
+ * @param {number} id The ID of the hero to fetch.
+ * @returns {HeroListing} The requested hero.
+ * @throws {Error} If no Hero exists with the given `id`.
  */
 function getHero(id) {
 	const hero = heroMap.get(id);
@@ -245,9 +241,11 @@ function getHero(id) {
 }
 
 /**
- * Removes a hero from the specified team.
- * @param {Hero} hero
- * @param {"ally" | "enemy" | "ban"} team
+ * Removes a hero from the specified team or ban list.
+ *
+ * @param {Hero} hero The hero to remove.
+ * @param {"ally" | "enemy" | "ban"} team The team from which to remove the hero (or "ban" to unban
+ * a hero).
  */
 function removeHeroFromTeam(hero, team) {
 	let teamDom;
@@ -273,8 +271,11 @@ function removeHeroFromTeam(hero, team) {
 }
 
 /**
- * @param {Hero} hero
- * @param {"ally" | "enemy" | "ban"} team
+ * Adds a hero to a team or the ban list.
+ *
+ * @param {Hero} hero The hero to add.
+ * @param {"ally" | "enemy" | "ban"} team The team to which to add the hero (or "ban" for adding it
+ * to the ban list).
  */
 function addToTeam(hero, team) {
 	const elem = document.createElement("figure");
@@ -308,7 +309,9 @@ function addToTeam(hero, team) {
 }
 
 /**
- * @param {null | Hero} hero
+ * Selects a hero for display in the detailed view pane on the right.
+ *
+ * @param {null | Hero} hero The selected hero, or `null` to clear selection.
  */
 function selectHero(hero) {
 	selectedHero = hero;
