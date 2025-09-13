@@ -448,8 +448,11 @@ function createHeroListing(hero) {
 }
 
 /**
- * @param {HeroListing} heroListing
- * @returns {boolean}
+ * Checks if a given hero listing should be hidden based on the current filter states and the hero's
+ * fuzzy score.
+ *
+ * @param {HeroListing} heroListing The hero to check.
+ * @returns {boolean} `true` if the hero should be hidden, `false` otherwise.
  */
 function shouldFilter(heroListing) {
 	if (heroListing.onTeam || heroListing.fuzzyScore === null) {
