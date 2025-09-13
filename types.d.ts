@@ -85,6 +85,7 @@ export interface MatchUp {
 export interface HeroListing {
 	hero: Hero;
 	domElement: HTMLLIElement;
+	matchUpText: HTMLSpanElement;
 	fuzzyScore: number | null;
 	onTeam: boolean;
 }

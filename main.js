@@ -38,6 +38,8 @@ function createElementWithText(tag, text) {
 const allHeroes = [];
 /** @type {Map<number, HeroListing>} */
 const heroMap = new Map();
+/** @type {Map<number, Record<number, MatchUp>>} */
+const matchupMap = new Map();
 
 /**
  * Constructs an icon element for a hero attribute.
@@ -182,6 +184,13 @@ function removeHeroFromTeam(hero, team) {
  * to the ban list).
  */
 function addToTeam(hero, team) {
+	if (!matchupMap.has(hero.id)) {
+		getMatchups(hero.id).then(
+			m => {
+				matchupMap.set(hero.id, Object.fromEntries(m.map(x => [x.hero_id, x])));
+			}
+		);
+	}
 	const elem = document.createElement("figure");
 	elem.id = `${hero.id}`;
 	const figImage = heroImage(hero);
@@ -334,7 +343,8 @@ function selectHero(hero) {
 
 /**
  * @param {Hero} hero
- * @returns {HTMLLIElement}
+ * @returns {[HTMLLIElement, HTMLSpanElement]} The full DOM element for the hero and the descendent
+ * span for holding matchup text.
  */
 function createHeroListing(hero) {
 	const elem = document.createElement("li");
@@ -347,11 +357,14 @@ function createHeroListing(hero) {
 	figure.appendChild(figImage);
 	figure.appendChild(figCaption);
 	elem.appendChild(figure);
+	const matchupSpan = document.createElement("span");
+	matchupSpan.classList.add("matchup-text");
+	elem.appendChild(matchupSpan);
 	elem.addEventListener("click", () => {
 		selectHero(hero);
 	});
 	elem.classList.add(hero.primary_attr);
-	return elem;
+	return [elem, matchupSpan];
 }
 
 /**
@@ -369,6 +382,46 @@ function shouldFilter(heroListing) {
 		return true;
 	}
 	return false;
+}
+
+/**
+ * Gets a specified team or ban list.
+ *
+ * @param {"ally" | "enemy" | "ban"} team The team to get - or "ban" to retrieve the ban list.
+ * @returns {Array<number>} A list of the IDs of the Heroes on the requested team.
+ */
+function getTeam(team) {
+	let teamElem;
+	switch (team) {
+		case "ally":
+			teamElem = myTeam;
+			break;
+		case "enemy":
+			teamElem = enemyTeam;
+			break;
+		case "ban":
+			teamElem = bannedTeam;
+			break;
+	}
+	return Array.from(teamElem.children).map(e => Number(e.id));
+}
+
+/**
+ *
+ * @param {HeroListing} hero
+ * @param {MatchUp | null} matchup
+ */
+function setMatchups(hero, matchup) {
+	let amt = 0;
+	if (matchup !== null) {
+		amt = Math.round((1000 * matchup.wins / matchup.games_played) - 500)/10;
+	}
+	for (const child of hero.matchUpText.children) {
+		hero.matchUpText.removeChild(child);
+	}
+	hero.matchUpText.textContent = `${amt < 0 ? "-" : "+"}${amt.toFixed(1)}%`;
+	const txt = matchup === null ? "(0/0)" : `(${matchup.wins}/${matchup.games_played})`;
+	hero.matchUpText.appendChild(createElementWithText("span", txt));
 }
 
 /**
@@ -396,7 +449,33 @@ function updateListings() {
 		}
 		return (a.fuzzyScore ?? 0) - (b.fuzzyScore ?? 0);
 	});
+	/** @type {null | Record<number, MatchUp>} */
+	let matchups = null;
+	const enemies = getTeam("enemy");
+	let enemy = enemies.pop();
+	if (enemy) {
+		const initialMatchups = matchupMap.get(enemy);
+		if (!initialMatchups) {
+			console.warn("attempting to calculate winrates before matchup request complete for hero", enemy);
+		} else {
+			matchups = initialMatchups;
+			for (enemy of enemies) {
+				const mus = matchupMap.get(enemy);
+				if (!mus) {
+					console.warn("attempting to calculate winrates before matchup request complete for hero", enemy);
+					continue;
+				}
+				for (const [id, mu] of Object.entries(mus)) {
+					const numericID = Number(id);
+					matchups[numericID].games_played += mu.games_played;
+					matchups[numericID].wins += mu.wins;
+				}
+			}
+		}
+	}
 	for (const hero of heroes) {
+		// some heroes have no match data; e.g. Kez in captains mode games (so pro league)
+		setMatchups(hero, matchups === null ? null : matchups[hero.hero.id] ?? null);
 		heroesList.appendChild(hero.domElement);
 	}
 }
@@ -443,6 +522,12 @@ globalThis.addEventListener("load", async () => {
 		console.error("filters should be checkbox inputs");
 		return;
 	}
+	if (!(searchBox instanceof HTMLInputElement)) {
+		console.debug(searchBox);
+		console.error("search box input should be an input");
+		return;
+	}
+
 	myTeam = me;
 	enemyTeam = enemy;
 	heroesList = hList;
@@ -469,14 +554,17 @@ globalThis.addEventListener("load", async () => {
 		updateListings();
 	});
 	searchBox.addEventListener("input", search);
+	searchBox.value = "";
 	document.addEventListener("reset", search);
 
 	const hs = await getHeroStats();
 	for (const h of hs.sort((a,b) => a.localized_name > b.localized_name ? 1 : -1)) {
 		allHeroes.push(h);
+		const [domElement, matchUpText] = createHeroListing(h);
 		const hero = {
 			hero: h,
-			domElement: createHeroListing(h),
+			domElement,
+			matchUpText,
 			fuzzyScore: 0,
 			onTeam: false
 		};
