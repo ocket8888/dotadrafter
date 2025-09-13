@@ -419,7 +419,7 @@ function setMatchups(hero, matchup) {
 	for (const child of hero.matchUpText.children) {
 		hero.matchUpText.removeChild(child);
 	}
-	hero.matchUpText.textContent = `${amt < 0 ? "-" : "+"}${amt.toFixed(1)}%`;
+	hero.matchUpText.textContent = `${amt < 0 ? "" : "+"}${amt.toFixed(1)}%`;
 	const txt = matchup === null ? "(0/0)" : `(${matchup.wins}/${matchup.games_played})`;
 	hero.matchUpText.appendChild(createElementWithText("span", txt));
 }
