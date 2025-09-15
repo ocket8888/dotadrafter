@@ -587,6 +587,7 @@ globalThis.addEventListener("load", async () => {
 			fuzzyScore: 0,
 			onTeam: false
 		};
+		setMatchups(hero, null);
 		heroes.push(hero)
 		heroMap.set(h.id, hero);
 		heroesList.appendChild(hero.domElement);
