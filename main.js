@@ -34,6 +34,24 @@ function createElementWithText(tag, text) {
 	return elem;
 }
 
+const colorMax = 225;
+const colorMin =  70;
+
+/** @param {number} n */
+function getNumberColor(n) {
+	if (n > 10) {
+		n = 10;
+	} else if (n < -10) {
+		n = -10;
+	}
+	const midPoint = ((colorMax + colorMin)/2);
+	const midPointDistance = (colorMax-colorMin)/2;
+	const g = midPoint + (n*midPointDistance/10);
+	const r = midPoint - (n*midPointDistance/10);
+	const b = midPoint - Math.abs(n)*(midPoint - colorMin)/10;
+	return [r, g, b];
+}
+
 /** @type {Array<Hero>} */
 const allHeroes = [];
 /** @type {Map<number, HeroListing>} */
@@ -419,6 +437,7 @@ function setMatchups(hero, matchup) {
 	for (const child of hero.matchUpText.children) {
 		hero.matchUpText.removeChild(child);
 	}
+	hero.matchUpText.style.color = `rgb(${getNumberColor(amt).join(", ")})`
 	hero.matchUpText.textContent = `${amt < 0 ? "" : "+"}${amt.toFixed(1)}%`;
 	const txt = matchup === null ? "(0/0)" : `(${matchup.wins}/${matchup.games_played})`;
 	hero.matchUpText.appendChild(createElementWithText("span", txt));

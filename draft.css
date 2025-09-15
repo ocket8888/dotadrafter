@@ -190,6 +190,7 @@ li.all {
 	height: 140px;
 	cursor: pointer;
 	text-align: center;
+	position: relative;
 }
 
 .hero-list-figure {
@@ -200,6 +201,22 @@ li.all {
 .hero-list-figure img {
 	width: 100%;
 	aspect-ratio: 16/9 auto;
+}
+
+.matchup-text {
+	color: white; /* this will be overridden by the function that sets this text, but it's nice to have a default */
+	font-size: smaller;
+	background: rgba(0, 0, 0, 0.8);
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	border-bottom-right-radius: 2px;
+	border-top-left-radius: 3px;
+	padding: 5px
+}
+
+.matchup-text span {
+	font-size: smaller;
 }
 
 .hp-bar, .mana-bar {
